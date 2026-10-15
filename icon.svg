@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="REA MCP switch">
+  <title>REA MCP switch</title>
+  <!-- Board: the MCP server row this plugin switches. -->
+  <rect x="11" y="5" width="42" height="54" rx="11" fill="none" stroke="#4a5568" stroke-width="3.4"/>
+  <!-- Connector pins: the stdio transport at the top edge. -->
+  <g fill="#4a5568">
+    <circle cx="24" cy="5" r="4.2"/>
+    <circle cx="40" cy="5" r="4.2"/>
+    <circle cx="24" cy="59" r="4.2"/>
+    <circle cx="40" cy="59" r="4.2"/>
+  </g>
+  <!-- Switch track. -->
+  <rect x="24" y="17" width="16" height="30" rx="8" fill="none" stroke="#4a5568" stroke-width="3.4"/>
+  <!-- Knob, up = the server is running. -->
+  <circle cx="32" cy="25" r="5.4" fill="#247bbf"/>
+</svg>

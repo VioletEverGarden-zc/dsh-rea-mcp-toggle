@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "REA MCP Switch",
+    "description": "Turns the REA MCP server (rea-mcp) on or off from the Session header, and exposes the same switch to the agent as the rea_mcp_toggle tool. The choice is stored in this profile and survives restarts."
+  }
+}

@@ -1,0 +1,18 @@
+# Local install artifact: `scripts/link-deps.mjs` creates it (a link to the
+# Harness installation's scope) so this path-linked bundle resolves its imports.
+# It is machine-specific and must never be committed.
+node_modules/
+
+# Harness runtime state that lands next to a checkout when someone tests against
+# a profile directory in place.
+.rea-mcp-toggle.state.json
+.rea-mcp-toggle.state.json.tmp
+
+# The machine-local "where is the Harness installed" answer. The committed
+# template is `.harness-root.example`; the real file is per-machine state.
+.harness-root
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.log

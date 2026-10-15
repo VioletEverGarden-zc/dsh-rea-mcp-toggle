@@ -1,0 +1,22 @@
+# Bundle patch layer for the REA MCP toggle.
+#
+# One Host row. `index.js` owns the single toggle implementation — it saves the
+# choice to its own state file, applies it to the live Loader row, and exposes
+# the very same service methods to two callers:
+#
+#   * the Web UI Session-header switch, over the Remote namespace `reaMcp`;
+#   * the agent tool `rea_mcp_toggle` (actions: status / set / probe / selftest).
+#
+# The `dsh.client` declaration in package.json makes the web app load ./client.js
+# as the browser half (the switch button).
+#
+# This bundle never inserts or overrides the `rea-mcp` row itself. That row is
+# declared by the hand-maintained home layer (%DSH_HOME%/cordis.patch.yml), whose
+# command / args / env / toolCallTimeoutMs / failOnStartupError settings are left
+# untouched. A `disabled` flag written into THIS profile layer cannot decide that
+# row (the home layer applies last and re-inserts it, discarding the flag), which
+# is why the choice lives in the state file instead and the home layer carries the
+# one `!!js` seam that reads it. See README.md.
+- insert:
+    - id: rea-mcp-toggle
+      name: 'dsh-rea-mcp-toggle'

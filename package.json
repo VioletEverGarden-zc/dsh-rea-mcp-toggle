@@ -1,0 +1,70 @@
+{
+  "name": "dsh-rea-mcp-toggle",
+  "version": "1.0.0",
+  "description": "Switch the REA MCP server (rea-mcp) on and off from the DeepSeek Harness Web UI, with a matching agent tool; the choice persists across restarts.",
+  "license": "MIT",
+  "author": "VioletEverGarden-zc (https://github.com/VioletEverGarden-zc)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VioletEverGarden-zc/dsh-rea-mcp-toggle.git"
+  },
+  "homepage": "https://github.com/VioletEverGarden-zc/dsh-rea-mcp-toggle#readme",
+  "bugs": {
+    "url": "https://github.com/VioletEverGarden-zc/dsh-rea-mcp-toggle/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "bundle",
+    "mcp",
+    "rea",
+    "toggle"
+  ],
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./state": "./state.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "state.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/en.json",
+    "locale/zh.json",
+    "icon.svg",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "link-deps": "node scripts/link-deps.mjs",
+    "check": "node --check index.js && node --check state.js && node --check client.js",
+    "check:schema": "node scripts/check-tool-schema.mjs index.js",
+    "probe:composition": "node scripts/probe-composition.mjs \"%DSH_PROFILE_DIR%\" \"%DSH_HOME%\"",
+    "probe:layers": "node scripts/probe-layer-order.mjs \"%DSH_PROFILE_DIR%\" \"%DSH_HOME%\"",
+    "probe:seam": "node scripts/probe-seam.mjs",
+    "probe:roundtrip": "node scripts/probe-roundtrip.mjs",
+    "acceptance": "node scripts/acceptance.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

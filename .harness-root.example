@@ -1,0 +1,16 @@
+# Where the DeepSeek Harness installation lives on THIS machine.
+#
+# Copy this file to `.harness-root` and put the installation root on one line.
+# The scripts read it when the argument and DSH_HARNESS_ROOT are absent, and it
+# is the answer of last resort for a layout no standard location describes.
+#
+# `.harness-root` is git-ignored: it is machine state, never part of the project.
+#
+# With the desktop app, the root is the `resources/harness` directory inside the
+# installation, for example:
+#   <install-dir>\resources\harness
+#   C:\Users\<you>\AppData\Local\Programs\<app>\resources\harness
+#
+# A valid root contains:
+#   node_modules/@deepseek-ai/{cordis,dsh,dsh-tools}
+#   node_modules/js-yaml

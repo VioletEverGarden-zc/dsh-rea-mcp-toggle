@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "REA MCP 开关",
+    "description": "在会话标题栏一键开关 REA MCP 服务器（rea-mcp），并向模型提供同源的 rea_mcp_toggle 工具。开关状态保存在当前 profile，重启后依然有效。"
+  }
+}

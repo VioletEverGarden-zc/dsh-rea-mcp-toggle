@@ -1,0 +1,23 @@
+# Normalize line endings for every text file in this project.
+#
+# Without this, a Windows checkout with `core.autocrlf=true` converts these files
+# to CRLF on checkout, and every cross-platform diff then reports the whole file
+# as changed. The plugin runs on Windows here, but the repository is published, so
+# the stored form stays LF and the working tree is forced to LF too — the same
+# bytes the Harness reads on any platform.
+* text=auto eol=lf
+
+# Windows-only helpers keep their platform line endings.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets must never be normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+
+# `icon.svg` is text (XML); keep it diffable.
+*.svg text eol=lf
