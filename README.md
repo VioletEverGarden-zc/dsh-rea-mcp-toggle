@@ -8,7 +8,7 @@
 
 ## 1. 项目解决什么问题
 
-REA（Reverse Engineer Anything）通过 MCP 以 stdio 方式接入 DSH。它的工具集非常大：**开启时是 170 个 `mcp__rea__*` 工具**，这些工具的 schema 会随**每一次**请求一起发给模型。
+REA（[Reverse Engineer Anything](https://github.com/morluto/rea)）通过 MCP 以 stdio 方式接入 DSH。它的工具集非常大：**开启时是 170 个 `mcp__rea__*` 工具**，这些工具的 schema 会随**每一次**请求一起发给模型。
 
 实测同一实例、同一时刻，`Tool.listTools` 的返回体大小：
 
@@ -394,5 +394,10 @@ node scripts/acceptance.mjs '<PROFILE_DIR>' '<DSH_HOME>'
 
 - 作者：**VioletEverGarden-zc** — <https://github.com/VioletEverGarden-zc>
 - 仓库：<https://github.com/VioletEverGarden-zc/dsh-rea-mcp-toggle>
+- 上游项目：**REA**（Reverse Engineer Anything）— <https://github.com/morluto/rea>。本插件只提供「开关」，REA 本体及其 `mcp__rea__*` 工具集由上游项目提供与维护（MIT）。
 
 > 仓库 URL 按包名 `dsh-rea-mcp-toggle` 填写。若你实际建仓时用了别的名字，请同步替换 `package.json` 里的 `repository` / `homepage` / `bugs` 三处与本节链接。
+
+## 11. 致谢
+
+感谢 [REA](https://github.com/morluto/rea)（Reverse Engineer Anything）的作者与贡献者。本插件只是替它加了一只开关，逆向能力全部来自上游；没有 REA，这个项目没有存在的理由。
