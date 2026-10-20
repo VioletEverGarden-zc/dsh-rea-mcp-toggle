@@ -1,6 +1,6 @@
 {
   "name": "dsh-rea-mcp-toggle",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Switch the REA MCP server (rea-mcp) on and off from the DeepSeek Harness Web UI, with a matching agent tool; the choice persists across restarts.",
   "license": "MIT",
   "author": "VioletEverGarden-zc (https://github.com/VioletEverGarden-zc)",

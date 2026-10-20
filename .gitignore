@@ -16,3 +16,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Transient lock files left behind by file-writing tooling.
+.dsh-ops-update-*.lock

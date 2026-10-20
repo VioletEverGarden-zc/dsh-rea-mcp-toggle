@@ -151,6 +151,66 @@ node scripts/acceptance.mjs        # 校验缝与状态文件在同一口径上
 
 再在会话里执行 `rea_mcp_toggle {action:"selftest"}` —— 它走的就是 Web UI 的 Remote 网关路径。
 
+### 3.5 升级 REA 之后：开关「静默变哑」（`rea setup` 会覆盖开关缝）
+
+`rea setup --client dsh`（安装 / 升级 REA 时常用）会**整份重写** `%DSH_HOME%\cordis.patch.yml`。重写后：
+
+- `rea-mcp` 行还在，`config` 也更新到新版本（新 env、新超时）；
+- 但你手写的那段行级 `disabled: !!js` **被丢掉了**。
+
+症状不是报错，而是静默失效：UI 按钮照常切换、状态文件照常写入，`rea-mcp` 行却不再读它。判定方法：
+
+```
+rea_mcp_toggle {action:"probe"}
+# 缝被覆盖时：seam=false，rea-mcp 行 effectiveDisabled=false，reaTools=170 常态驻留
+# 正常时（关闭态）：seam=true，effectiveDisabled=true，reaTools=0
+```
+
+**修法一（手动）**：把 3.3 的 YAML 片段重新贴回 `rea-mcp` 行（先备份）。
+
+**修法二（推荐，幂等）**：用仓库里的补缝脚本，它只做「检查 + 追加」，绝不重写文件：
+
+```powershell
+node scripts/ensure_seam.mjs                      # 读 $env:DSH_HOME
+node scripts/ensure_seam.mjs --home "<DSH_HOME>"  # 或显式指定
+```
+
+行为与退出码：
+
+| 情况 | 动作 | exit |
+|---|---|---|
+| 缝已在位 | 静默（不污染会话上下文） | 0 |
+| 有 `id: rea-mcp` 行、缝缺失 | 先备份 `.bak-<时间戳>`，再**追加** | 0 |
+| 找不到 `id: rea-mcp` 行 | 什么都不碰 | 3 |
+| patch 文件 / `DSH_HOME` 缺失 | 报错 | 2 |
+
+因为它静默且幂等，可以挂到会话启动钩子（`hooks.json`），让「跑完 setup」自动回填：
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command",
+          "command": "node \"<本仓库路径>\\scripts\\ensure_seam.mjs\"" } ] }
+    ]
+  }
+}
+```
+
+更省事的做法是把 `rea setup` 包一层，跑完顺手补缝：
+
+```powershell
+function rea-setup {
+    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Rest)
+    & node "<npm 全局>/node_modules/rea-agents/scripts/rea.mjs" setup --client dsh @Rest
+    if ($LASTEXITCODE -eq 0) { node "<本仓库路径>/scripts/ensure_seam.mjs" }
+}
+```
+
+**补完必须重启一次 DSH 会话**：`disabled` 只在行装载时求值，重写后的行需要重新加载；只补文件不重启，当前会话里仍是旧行为。
+
+> 本插件与 REA 版本无耦合（它只读状态文件），升级 REA **不需要**改插件代码。唯一要留意的是这条缝。
+
 ---
 
 ## 4. 使用方法
@@ -171,6 +231,7 @@ UI 按钮点了没反应，帮我看看     → 模型调用 rea_mcp_toggle {act
 
 - **临时关**：点按钮。状态文件写 `enabled:false`，当前进程立即生效（工具消失、子进程回收）。
 - **永久不再启用**：把手改的那段 `disabled: !!js` 缝从家目录层删掉（保留其余内容），该行即恢复为无条件启用。
+- **升级 REA 后失效**：`rea setup --client dsh` 会把开关缝一起重写掉，补回方法见 3.5。
 - **彻底卸载**：见第 8 节。
 
 ---
@@ -328,7 +389,8 @@ dsh-rea-mcp-toggle/
 ├─ .gitignore            # 排除 node_modules 链接、状态文件、机器本地的 .harness-root
 ├─ .harness-root.example # 「harness 装在哪」的模板（真实文件 .harness-root 由使用者创建）
 └─ scripts/              # 安装辅助与验证脚本（不属于运行时，不随包发布）
-   └─ lib/harness-paths.mjs   # 定位 harness / profile：多级兜底，不硬编码任何本机路径
+   ├─ lib/harness-paths.mjs   # 定位 harness / profile：多级兜底，不硬编码任何本机路径
+   └─ ensure_seam.mjs         # 幂等补缝：rea setup 覆盖开关缝后自动回填（见 3.5）
 ```
 
 运行时**零依赖**：Host 半边只 import Node 内置模块（`node:fs`、`node:path`、`node:url`）与自身文件；`scripts/` 里的脚本才需要 DSH 安装提供的包。
@@ -339,6 +401,7 @@ dsh-rea-mcp-toggle/
 2. **`disabled` 行必须放在行级**，写成 `config` 的子字段会导致该行永不生效（`--dump-config` 可看出层级）。
 3. **上游遗留（不在本项目内）**：`@deepseek-ai/dsh-mcp-client` 的 `dispose()` 先取子进程句柄快照再 await；若拆卸时正好有连接在飞，那次连接会在快照之后写入新句柄，其子进程**不会被关闭**（每关一次可能残留一个孤儿 REA 进程）。该行本身确实是停的（fiber 已 dispose、工具为 0），残留进程只占内存、不向模型暴露工具，Harness 退出时回收。
 4. **`selftest` 需要一次重启后才可用**（Host 模块按进程加载）。
+5. **`rea setup --client dsh` 会覆盖开关缝**：上游把 `cordis.patch.yml` 当生成物整份重写，手写的 `disabled: !!js` 随之消失，开关静默失效。用 `scripts/ensure_seam.mjs` 幂等回填，见 3.5。
 
 ### 7.3 三个踩过的坑（写给后来者）
 
@@ -368,6 +431,7 @@ node scripts/probe-composition.mjs   # 组合结果中该行是否带 disabled
 node scripts/probe-seam.mjs          # 缝表达式 × Harness 真实 YAML 方言与求值器
 node scripts/probe-roundtrip.mjs     # 真实写/读 × 缝读取，含「损坏文件」降级分支
 node scripts/acceptance.mjs          # 缝与状态文件口径一致性
+node scripts/ensure_seam.mjs --home "<DSH_HOME>"   # 补缝（幂等；已在位则静默）
 ```
 
 不在 profile shell 里时，用参数显式给路径：
