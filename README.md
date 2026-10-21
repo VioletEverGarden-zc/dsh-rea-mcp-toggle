@@ -168,7 +168,7 @@ rea_mcp_toggle {action:"probe"}
 
 **修法一（手动）**：把 3.3 的 YAML 片段重新贴回 `rea-mcp` 行（先备份）。
 
-**修法二（推荐，幂等）**：用仓库里的补缝脚本，它只做「检查 + 追加」，绝不重写文件：
+**修法二（推荐，幂等）**：用仓库里的补缝脚本（零依赖，随 npm 包发布，位于包内 `scripts/ensure_seam.mjs`），它只做「检查 + 追加」，绝不重写文件：
 
 ```powershell
 node scripts/ensure_seam.mjs                      # 读 $env:DSH_HOME
@@ -388,12 +388,12 @@ dsh-rea-mcp-toggle/
 ├─ icon.svg              # 图标
 ├─ .gitignore            # 排除 node_modules 链接、状态文件、机器本地的 .harness-root
 ├─ .harness-root.example # 「harness 装在哪」的模板（真实文件 .harness-root 由使用者创建）
-└─ scripts/              # 安装辅助与验证脚本（不属于运行时，不随包发布）
+└─ scripts/              # 安装辅助与验证脚本（运行时不需要；仅 ensure_seam.mjs 随包发布）
    ├─ lib/harness-paths.mjs   # 定位 harness / profile：多级兜底，不硬编码任何本机路径
    └─ ensure_seam.mjs         # 幂等补缝：rea setup 覆盖开关缝后自动回填（见 3.5）
 ```
 
-运行时**零依赖**：Host 半边只 import Node 内置模块（`node:fs`、`node:path`、`node:url`）与自身文件；`scripts/` 里的脚本才需要 DSH 安装提供的包。
+运行时**零依赖**：Host 半边只 import Node 内置模块（`node:fs`、`node:path`、`node:url`）与自身文件；`scripts/` 里的验证脚本才需要 DSH 安装提供的包，`scripts/ensure_seam.mjs` 是例外——它同样零依赖，因此随 npm 包一起发布，装包后可直接运行。
 
 ### 7.2 已知限制
 
